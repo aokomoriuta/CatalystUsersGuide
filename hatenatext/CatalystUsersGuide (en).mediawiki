@@ -1,74 +1,102 @@
-The ParaView Catalyst User’s Guide is available under a Creative Commons Attribution license (CC by 3.0). © 2013, Kitware Inc. http://www.kitware.com Cover image generated from a Helios simulation of compressible flow past a sphere. Helios is developed by the U.S. Army’s Aeroflightdynamics Directorate.
+= The ParaView Catalyst User's Guide v1.0 =
+[[File:../images/10000000000004FB00000672D6C8B5C4.jpg|center]]
+The ParaView Catalyst User's Guide is available under a Creative Commons Attribution license (CC by 3.0). © 2013, Kitware Inc.
+
+http://www.kitware.com
+
+Cover image generated from a Helios simulation of compressible flow past a sphere. Helios is developed by the U.S. Army’s Aeroflightdynamics Directorate.
 
 We would like to acknowledge the support from:
-* Ken Moreland is the project lead for Sandia. Sandia has contributed significantly to the project both in development and vision. Sandia developers included Nathan Fabian and Ken Moreland.
-* Los Alamos National Lab - Jim Ahrens is the project lead at LANL. The LANL team has been integrating Catalyst with various LANL simulation codes and has contributed to the development of the library.
-* Army SBIR - Mark Potsdam, from Aeroflightdynamics Directorate, was the main technical point of contact for Army SBIRs and has contributed significantly to the vision of Catalyst.
+* [[File:../images/100000000000008200000032D78ED0A9.png]] Ken Moreland is the project lead for Sandia. Sandia has contributed significantly to the project both in development and vision. Sandia developers included Nathan Fabian and Ken Moreland.
+* [[File:../images/10000000000000A100000051FE3BA823.png]] Los Alamos National Lab - Jim Ahrens is the project lead at LANL. The LANL team has been integrating Catalyst with various LANL simulation codes and has contributed to the development of the library.
+* [[File:../images/10000201000000A100000051EB106121.png]] Army SBIR - Mark Potsdam, from Aeroflightdynamics Directorate, was the main technical point of contact for Army SBIRs and has contributed significantly to the vision of Catalyst.
 
-2
+== Section 1: Introduction to ParaView Catalyst ==
+Computer simulations are growing in sophistication and producing results of ever greater fidelity. This trend has been enabled by advances in numerical methods and increasing computing power. Yet these advances come with several costs including massive increases in data size, difficulties examining output data, challenges in configuring simulation runs, and difficulty debugging running codes. For computer simulation to provide the many significant benefits that have been exhaustively documented (“The Opportunities and Challenges of Exascale Computing: Summary Report of the Advanced Scientific Computing Advisory Committee (ASCAC) Subcommittee,”http://science.energy.gov/~/media/ascr/ascac/pdf/reports/Exascale_subcommittee_report.pdf, Fall 2010), it’s imperative to address these issues.
 
-Section 1: Introduction to ParaView Catalyst
-Computer simulations are growing in sophistication and producing results of ever greater fidelity. This trend has been enabled by advances in numerical methods and increasing computing power. Yet these advances come with several costs including massive increases in data size, difficulties examining output data, challenges in configuring simulation runs, and difficulty debugging running codes. For computer simulation to provide the many significant benefits that have been exhaustively documented (“The Opportunities and Challenges of Exascale Computing: Summary Report of the Advanced Scientific Computing Advisory Committee (ASCAC) Subcommittee,” http://science.energy.gov/~/media/ascr/ascac/pdf/reports/Exascale_subcommittee_report.pdf, Fall 2010), it’s imperative to address these issues. The Catalyst library is a system that addresses such challenges. It is designed to be easily integrated directly into large-scale numerical codes. Built on and designed to interoperate with the standard visualization toolkit VTK and and scalable ParaView application, it enables simulations to intelligently perform analysis, generate relevant output data, and visualize results concurrent with a running simulation. This ability to visualize and analyze data from simulations is referred to synonymously as in situ processing, co-processing, co-analysis, and covisualization. Thus Catalyst is often referred to as a co-processing, or in situ, library for highperformance computing (HPC). In the remainder of this Introduction section, we will motivate the use of Catalyst, and describe an example workflow to demonstrate just how easy Catalyst is to use in practice.
+The Catalyst library is a system that addresses such challenges. It is designed to be easily integrated directly into large-scale numerical codes. Built on and designed to interoperate with the standard visualization toolkit VTK and and scalable ParaView application, it enables simulations to intelligently perform analysis, generate relevant output data, and visualize results concurrent with a running simulation. This ability to visualize and analyze data from simulations is referred to synonymously as in situ processing, co-processing, co-analysis, and covisualization. Thus Catalyst is often referred to as a co-processing, or in situ, library for highperformance computing (HPC). 
 
-Motivation
-Computing systems have been increasing in speed and capacity for many years now. Yet not all of the various subsystems which make up a computing environment have been advancing equally as fast. This has led to many changes in the way large-scale computing is performed. For example, simulations have long been scaling towards hundreds of thousands of parallel computing cores in recognition that serial processing is inherently limited by the bottleneck of a single processor. As a result, parallel computing methods and systems are now central to modern computer simulation. Similarly, with the number of computing cores increasing to address bigger problems, IO is now becoming a limiting factor as the table below indicates. While the increase in FLOPS between FY2010 and 2018 is expected to be on the order of 500, IO bandwidth is increasing on the order of 100 times. 2010 Peak FLOP Rate 2 Pf/s 2018 1 Ef/s Factor Change 500
+In the remainder of this Introduction section, we will motivate the use of Catalyst, and describe an example workflow to demonstrate just how easy Catalyst is to use in practice.
 
-Input/Output Bandwidth
+===  Motivation ===
+Computing systems have been increasing in speed and capacity for many years now. Yet not all of the various subsystems which make up a computing environment have been advancing equally as fast. This has led to many changes in the way large-scale computing is performed. For example, simulations have long been scaling towards hundreds of thousands of parallel computing cores in recognition that serial processing is inherently limited by the bottleneck of a single processor. As a result, parallel computing methods and systems are now central to modern computer simulation. Similarly, with the number of computing cores increasing to address bigger problems, IO is now becoming a limiting factor as the table below indicates. While the increase in FLOPS between FY2010 and 2018 is expected to be on the order of 500, IO bandwidth is increasing on the order of 100 times. 
 
-0.2 TB/s
+{|
+|+ Table 1.1: Potential exascale computer performance. Source: DOE Exascale Initiative Roadmap, Architecture and Technology Workshop, San Diego, December, 2009.
+!                !! 2010   !! 2018    !! Factor Change 
+|-
+! Peak FLOP Rate || 2 Pf/s || 1 Ef/s  || 500
+|-
+! Input/Output Bandwidth || 0.2 TB/s || 20 TB/s || 100
+|}
 
-20 TB/s
+This divergence between computational power and IO bandwidth has profound implications on the way future simulation is performed. In the past it was typical to break the simulation process into three pieces: pre-processing (preparing input); simulation (execution); and post-processing (analyzing and visualizing results). This workflow is fairly simple and treats these three tasks independently, simplifying the development of new computational tools by relying on a loose coupling via data file exchange between each of the pieces. For example, preprocessing system are typically used to discretize the domain and specify material properties and boundary conditions, finally writing this information out into one or more input files to the simulation code. Similarly, the simulation process typically writes output files which are read in by the postprocessing system. However limitations in IO bandwidth throw a monkey wrench into this process, as the time to read and write data on systems with relatively large computational power is becoming a severe bottleneck to the simulation workflow. Savings can be obtained even for desktop systems with a small amount of parallel processes. This is shown in the figure below for a 6 process run on a desktop machine performing different analysis operations as well as IO. It is clear that the abundance of computational resources (cores) results in relatively rapid analysis, which even when taken together are faster than the time it takes for the simulation code to save a full dataset.
+[[File:../images/1000000000000256000001817F7BFCC0.png|thumb|center|Figure 1.1: Comparison of compute time in seconds for certain analysis operations vs. saving the full data set for a 6 process run on a desktop machine.]]
 
-100
+The root problem is that due to the ever increasing computational power available on the top HPC machines, analysts are now able to run simulations with increasing fidelity. Unfortunately this increase in fidelity corresponds to an increase in the data generated by the simulation. Due to the divergence between IO and computational capabilities, the resulting data bottleneck is now negatively impacting the simulation workflow. For large problems, gone are the days when data could be routinely written to disk and/or copied to a local workstation or visualization cluster. The cost of IO is becoming prohibitive, and large-scale simulation in the era of cheap FLOPS and expensive IO requires new approaches.
 
-3
+One popular, but crude approach relies on configuring the simulation process to save results less frequently (for example, in a time-varying analysis, every tenth time step may be saved, meaning that 90% of the results are simply discarded). However even this strategy is problematic: It is possible that a full save of the simulation data for even a single time step may exceed the capacity of the IO system, or require too much time to be practical.
 
-Table 1.1: Potential exascale computer performance. Source: DOE Exascale Initiative Roadmap, Architecture and Technology Workshop, San Diego, December, 2009. This divergence between computational power and IO bandwidth has profound implications on the way future simulation is performed. In the past it was typical to break the simulation process into three pieces: pre-processing (preparing input); simulation (execution); and post-processing (analyzing and visualizing results). This workflow is fairly simple and treats these three tasks independently, simplifying the development of new computational tools by relying on a loose coupling via data file exchange between each of the pieces. For example, preprocessing system are typically used to discretize the domain and specify material properties and boundary conditions, finally writing this information out into one or more input files to the simulation code. Similarly, the simulation process typically writes output files which are read in by the postprocessing system. However limitations in IO bandwidth throw a monkey wrench into this process, as the time to read and write data on systems with relatively large computational power is becoming a severe bottleneck to the simulation workflow. Savings can be obtained even for desktop systems with a small amount of parallel processes. This is shown in the figure below for a 6 process run on a desktop machine performing different analysis operations as well as IO. It is clear that the abundance of computational resources (cores) results in relatively rapid analysis, which even when taken together are faster than the time it takes for the simulation code to save a full dataset.
-
-Figure 1.1: Comparison of compute time in seconds for certain analysis operations vs. saving the full data set for a 6 process run on a desktop machine. The root problem is that due to the ever increasing computational power available on the top HPC machines, analysts are now able to run simulations with increasing fidelity. Unfortunately this increase in fidelity corresponds to an increase in the data generated by the simulation. Due to the divergence between IO and computational capabilities, the resulting data bottleneck is now negatively impacting the simulation workflow. For large problems, gone are the days when
-
-4
-
-data could be routinely written to disk and/or copied to a local workstation or visualization cluster. The cost of IO is becoming prohibitive, and large-scale simulation in the era of cheap FLOPS and expensive IO requires new approaches. One popular, but crude approach relies on configuring the simulation process to save results less frequently (for example, in a time-varying analysis, every tenth time step may be saved, meaning that 90% of the results are simply discarded). However even this strategy is problematic: It is possible that a full save of the simulation data for even a single time step may exceed the capacity of the IO system, or require too much time to be practical. A better approach, and the approach that Catalyst takes, is to change the traditional three-step simulation workflow of pre-processing, simulation, and post-processing (shown below)
-
+A better approach, and the approach that Catalyst takes, is to change the traditional three-step simulation workflow of pre-processing, simulation, and post-processing (shown below)
+[[File:../images/100000000000032000000060CF0D3E43.jpg|center]]
 to one that integrates post-processing directly into the simulation process as shown below.
+[[File:../images/10000000000003630000008394EAD03D.png|center]]
 
 This integration of simulation with post-processing provides several key advantages. First, it avoids the need to save out intermediate results for the purpose of post-processing; instead post-processing can be performed in situ as the simulation is running, This saves considerable time as illustrated below.
 
+{|
+| [[File:../images/100000000000014100000100F2AF183D.png]]
+| [[File:../images/1000000000000140000001007D4B64D7.png]]
+|}
 Figure 1.2: Comparison of full workflow for CTH with post-processing results (left plot) vs. full workflow with in situ processing with Catalyst. Results courtesy of Sandia National Laboratories.
-
-5
 
 Further, instead of saving full datasets to disk, IO can be reduced by extracting only relevant information. Data extracts like isocontours, data slices, or streamlines are generally orders of magnitude smaller than the full dataset (see figure below). Thus writing out extracts significantly reduces the total IO cost.
 
-Figure 1.3: Comparison of file size in bytes for saving full data set vs. saving specific analysis outputs. Finally, unlike blind subsampling of results, using an integrated approach it becomes possible to analyze the current state of the simulation and save only information pertinent to the scientific query at hand. For example, it is possible to identify the signs of a forming shock and then save only that information in the neighborhood of the shock. There are other important applications that address the complexity of the simulation process. Using co-processing it is possible to monitor the progress of the simulation, and ensure that it is progressing in a valid way. It is not uncommon for a long running simulation (maybe days or longer in duration) to be tossed out because initial boundary conditions or solution parameters were specified incorrectly. By checking intermediate results it’s possible to catch mistakes like these and terminate such runs before they incur excessive costs. Similarly, co-processing enables debugging of simulation codes. Visualization can be used to great effect to identify regions of instability or numerical breakdown. Catalyst was created as a library to achieve the integration of simulation and post-processing. It has been designed to be easy to use and introduces minimal disruption into numerical codes. It leverages standard systems such as VTK and ParaView (for post-processing) and utilizes modern scientific tools like Python for control and analysis. Overall Catalyst has been shown to dramatically increase the effectiveness of the simulation workflow by reducing the amount of IO, thereby reducing the time to gain insight into a given problem, and more efficiently utilizing modern HPC environments with abundant FLOPS and restricted IO bandwidth.
+[[File:../images/100000000000021D0000011230A8DD39.png|thumb|center|Figure 1.3: Comparison of file size in bytes for saving full data set vs. saving specific analysis outputs.]]
 
-Example Workflow
+Finally, unlike blind subsampling of results, using an integrated approach it becomes possible to analyze the current state of the simulation and save only information pertinent to the scientific query at hand. For example, it is possible to identify the signs of a forming shock and then save only that information in the neighborhood of the shock.
 
-6
+There are other important applications that address the complexity of the simulation process. Using co-processing it is possible to monitor the progress of the simulation, and ensure that it is progressing in a valid way. It is not uncommon for a long running simulation (maybe days or longer in duration) to be tossed out because initial boundary conditions or solution parameters were specified incorrectly. By checking intermediate results it’s possible to catch mistakes like these and terminate such runs before they incur excessive costs. Similarly, co-processing enables debugging of simulation codes. Visualization can be used to great effect to identify regions of instability or numerical breakdown.
 
+Catalyst was created as a library to achieve the integration of simulation and post-processing. It has been designed to be easy to use and introduces minimal disruption into numerical codes. It leverages standard systems such as VTK and ParaView (for post-processing) and utilizes modern scientific tools like Python for control and analysis. Overall Catalyst has been shown to dramatically increase the effectiveness of the simulation workflow by reducing the amount of IO, thereby reducing the time to gain insight into a given problem, and more efficiently utilizing modern HPC environments with abundant FLOPS and restricted IO bandwidth.
+
+== Example Workflow ==
 The figure below demonstrates a typical workflow using Catalyst for in situ processing. In this figure it is assumed that Catalyst has already been integrated into the simulation code (see Section 3 for details on how to integrate Catalyst). The workflow is initiated by creating a Python script using ParaView’s GUI which specifies the desired output from the simulation. Next, when the simulation starts it loads this script; then during execution any analysis and visualization output is generated in synchronous fashion (i.e., while the simulation is running). Catalyst can produce images/screenshots, compute statistical quantities, generate plots, and extract derived information such as polygonal data or iso-surfaces to visualize geometry and/or data.
 
-Figure 1.4: In situ workflow with various Catalyst outputs. Catalyst has been used by a variety of simulation codes. CTH, a shock physics code from Sandia, has been instrumented to use Catalyst. Additionally, Phasta from UC Boulder <insert ref>, NPIC and VPIC from LANL, Helios from the Army’s Aeroflightdynamics Directorate, S3D and the Sierra simulation framework from Sandia and H3D from UCSD have all been instrumented to use Catalyst. Some example outputs are shown below.
+[[File:../images/100000000000039C0000022E03462467.jpg|thumb|center|Figure 1.4: In situ workflow with various Catalyst outputs.]]
 
-7
+Catalyst has been used by a variety of simulation codes. CTH, a shock physics code from Sandia, has been instrumented to use Catalyst. Additionally, Phasta from UC Boulder <insert ref>, NPIC and VPIC from LANL, Helios from the Army’s Aeroflightdynamics Directorate, S3D and the Sierra simulation framework from Sandia and H3D from UCSD have all been instrumented to use Catalyst. Some example outputs are shown below.
 
-A
+{|
+| A [[File:../images/100000000000029F00000200F56FB939.jpg]]
+| B [[File:../images/100000000000028F000002DC8B54BF85.jpg]]
+|-
+| C [[File:../images/100000000000025C000003BB909227A8.jpg]]
+| D [[File:../images/100000000000025A00000371EC6256FE.jpg]]
+|}
+Figure 1.5: Various results from simulation codes linked with Catalyst(A: Phasta; B: Helios; C: S3D; D: CTH). Note that post-processing with different packages was performed with B and D.
 
-B
+Of course Catalyst is not necessarily applicable in all situations. First, if significant reductions in IO are important, then it’s important that the specified analysis and visualization pipelines invoked by Catalyst actually produce reduced data size. Another important consideration is whether these pipelines scale appropriately. If they do not, then a large-scale simulation may bog down during co-processing, detrimentally impacting total analysis cycle time. However, both the underlying ParaView and VTK systems have been developed with parallel scaling in mind, and generally perform well in most applications. The figure below shows two scale plots for two popular algorithms: slicing through a dataset, and decimating large meshes (e.g., reducing the size of an output isocontour).
 
-C D Figure 1.5: Various results from simulation codes linked with Catalyst(A: Phasta; B: Helios; C: S3D; D: CTH). Note that post-processing with different packages was performed with B and D. Of course Catalyst is not necessarily applicable in all situations. First, if significant reductions in IO are important, then it’s important that the specified analysis and visualization pipelines invoked by Catalyst actually produce reduced data size. Another important consideration is whether these pipelines scale appropriately. If they do not, then a large-scale simulation may bog down during co-processing, detrimentally impacting total analysis cycle time. However, both the underlying ParaView and VTK systems have been developed with parallel scaling in mind, and generally perform well in most applications. The figure below shows two scale plots for two
+{|
+| [[File:../images/10000000000001F60000012E863912AD.png|left]]
+| [[File:../images/10000000000001F60000012EC249A492.png|lright]]
+|}
+Figure 1.6: Scaling performance of the slice filter (left) and decimate filter (right).
 
-8
+Such stellar performance is typical of VTK algorithms, but we recommend that you confirm this behavior for your particular analysis pipeline(s).
 
-popular algorithms: slicing through a dataset, and decimating large meshes (e.g., reducing the size of an output isocontour).
+== Further Information ==
+The following are various links of interest related to Catalyst: 
+* [http://www.paraview.org www.paraview.org] - the main ParaView page with links to wikis, code, documentation, etc.
+* [http://www.paraview.org/paraview/resources/software.php www.paraview.org/paraview/resources/software.php] - the main ParaView download page -- useful for installing ParaView on local machines for creating Catalyst scripts and viewing Catalyst output. 
+* [http://catalyst.paraview.org catalyst.paraview.org] - the main page for Catalyst
+* [mailto://paraview@paraview.org paraview@paraview.org] - the mailing list for general ParaView and Catalyst support
 
-Figure 1.6: Scaling performance of the slice filter (left) and decimate filter (right). Such stellar performance is typical of VTK algorithms, but we recommend that you confirm this behavior for your particular analysis pipeline(s).
+The remainder of this guide is broken up into three main sections. Section 2 addresses users that wish to use simulation codes that have already been instrumented with Catalyst. Section 3 is for developers who wish to instrument their simulation code. Section 4 focuses on those users who wish to install and maintain Catalyst on their computing systems.
 
-Further Information
-The following are various links of interest related to Catalyst: ● www.paraview.org - the main ParaView page with links to wikis, code, documentation, etc. ● www.paraview.org/paraview/resources/software.php - the main ParaView download page -- useful for installing ParaView on local machines for creating Catalyst scripts and viewing Catalyst output. ● catalyst.paraview.org - the main page for Catalyst ● paraview@paraview.org - the mailing list for general ParaView and Catalyst support The remainder of this guide is broken up into three main sections. Section 2 addresses users that wish to use simulation codes that have already been instrumented with Catalyst. Section 3 is for developers who wish to instrument their simulation code. Section 4 focuses on those users who wish to install and maintain Catalyst on their computing systems.
 
-9
+= Under construction..... =
 
 Section 2: Catalyst for Users
 This section discusses Catalyst with respect to the simulation user. The first thing to understand is that Catalyst fundamentally changes the workflow for gaining insights into physical problems being numerically simulated.
