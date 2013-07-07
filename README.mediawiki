@@ -9,3 +9,12 @@
 
 This project is licensed under [http://creativecommons.org/licenses/by/3.0/ Creative Commons Attribution-ShareAlike 3.0 Unported].
 The original PDF is available on [http://public.kitware.com/pipermail/paraview-developers/2013-June/002314.html [Paraview-developers] ParaView Catalyst User's Guide] ([http://public.kitware.com/pipermail/paraview-developers/attachments/20130621/dcb563ff/attachment-0001.pdf direct link).
+
+== Files ==
+* README.mediawiki : this text file
+* CatalystUsersGuide.pdf : Copy of the original PDF
+* CatalystUsersGuide.txt : Raw extracted text from PDF
+* hatenatext : translated & formatted text files with [http://hatenadiary.g.hatena.ne.jp/keyword/%E3%81%AF%E3%81%A6%E3%81%AA%E8%A8%98%E6%B3%95%E4%B8%80%E8%A6%A7 はてな記法(Hatena Markup)]
+** CatalystUsersGuide (en).hatenatext : in English (only formatted)
+** CatalystUsersGuide (ja).hatenatext : in Japanese (translation)
+* images : extracted images from PDF
