@@ -1,7 +1,6 @@
 = The ParaView Catalyst User's Guide =
 ;original author (attribution)
 : Andrew C.Bauer, Berk Geveci, Will Schroeder (Kitware Inc.)
-:copyright
 : © 2013, Kitware Inc. http://www.kitware.com
 ;translator (Japanese)
 : 青子守歌 (aokomoriuta)
