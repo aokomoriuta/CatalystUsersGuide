@@ -1,12 +1,9 @@
-1
-
 The ParaView Catalyst User’s Guide is available under a Creative Commons Attribution license (CC by 3.0). © 2013, Kitware Inc. http://www.kitware.com Cover image generated from a Helios simulation of compressible flow past a sphere. Helios is developed by the U.S. Army’s Aeroflightdynamics Directorate.
 
 We would like to acknowledge the support from:
-
-Ken Moreland is the project lead for Sandia. Sandia has contributed significantly to the project both in development and vision. Sandia developers included Nathan Fabian and Ken Moreland. Los Alamos National Lab - Jim Ahrens is the project lead at LANL. The LANL team has been integrating Catalyst with various LANL simulation codes and has contributed to the development of the library.
-
-Army SBIR - Mark Potsdam, from Aeroflightdynamics Directorate, was the main technical point of contact for Army SBIRs and has contributed significantly to the vision of Catalyst.
+* Ken Moreland is the project lead for Sandia. Sandia has contributed significantly to the project both in development and vision. Sandia developers included Nathan Fabian and Ken Moreland.
+* Los Alamos National Lab - Jim Ahrens is the project lead at LANL. The LANL team has been integrating Catalyst with various LANL simulation codes and has contributed to the development of the library.
+* Army SBIR - Mark Potsdam, from Aeroflightdynamics Directorate, was the main technical point of contact for Army SBIRs and has contributed significantly to the vision of Catalyst.
 
 2
 
