@@ -7,7 +7,7 @@
 : https://github.com/aokomoriuta
 
 This project is licensed under [http://creativecommons.org/licenses/by/3.0/ Creative Commons Attribution-ShareAlike 3.0 Unported].
-The original PDF is available on [http://public.kitware.com/pipermail/paraview-developers/2013-June/002314.html [Paraview-developers] ParaView Catalyst User's Guide] ([http://public.kitware.com/pipermail/paraview-developers/attachments/20130621/dcb563ff/attachment-0001.pdf direct link).
+The original PDF is available on [http://public.kitware.com/pipermail/paraview-developers/2013-June/002314.html [Paraview-developers] ParaView Catalyst User's Guide] ([http://public.kitware.com/pipermail/paraview-developers/attachments/20130621/dcb563ff/attachment-0001.pdf direct link]).
 
 == Files ==
 * README.mediawiki : this text file
